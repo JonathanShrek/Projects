@@ -6,8 +6,9 @@ def newUser():
     print('Confirm password: ')
     confirmUserPass = input("")
 
+#FIXME error in else statement
     if newUserPass != confirmUserPass:
-        for i in range(3, 0, -1):
+        for i in range(3, -1, -1):
             if newUserPass != confirmUserPass:
                 print(i, 'chances remain.')
                 print('Error: Confirm password:')
@@ -20,8 +21,21 @@ def newUser():
                 print('Enter username: ')
                 break
 
-if __name__ == "__main__":
+def findUser(n):
+    f = open('accounts.txt', 'r')
+    name = n
+    while True:
+        text = f.readlines()
+        for line in text:
+            if name in text:
+                print('Success')
+                break
+            
+        else:
+            print('Error: Unknown name. Try again:')
+            break
 
+def main():
     print("Enter username: ")
     print("Enter new to create a new user")
     while True:
@@ -31,11 +45,11 @@ if __name__ == "__main__":
             print('Goodbye')
             break
 
-        #elif userinput == lines():
-            #FIXME
-
         elif userinput == 'new' or userinput == 'New':
             newUser() 
 
         else:
-            print('Error: Unknown username. Please try again.')
+            findUser(userinput)
+
+if __name__ == "__main__":
+    main()

@@ -6,6 +6,7 @@ def newUser():
     print('Confirm password: ')
     confirmUserPass = input("")
 
+    #FIXME range is bugged
     if newUserPass != confirmUserPass:
         for i in range(3, -1, -1):
             if newUserPass != confirmUserPass:
@@ -14,32 +15,30 @@ def newUser():
                 confirmUserPass = input("")
     else:
         with open('accounts.txt', 'a') as out:
-            out.write(newUserName + '\n')
+            out.write(newUserName + ' ' + newUserPass + '\n')
             out.close()
         print('Success')
         print('Enter username: ')
 
+
 #FIXME does not read line to check if username exists
 def findUser(n):
-    f = open('accounts.txt', 'r')
-    name = n
-    while True:
+    with open('accounts.txt', 'r') as f:
         text = f.readlines()
-        f.close()
-        for line in text:
-            if name in text:
-                print('Success')
-                break
+        name = n
+        if name in text:
+            print('Success')
             
         else:
             print('Error: Unknown name. Try again:')
-            break
+        f.close()
 
 def main():
     print("Enter username: ")
     print("Enter new to create a new user")
     while True:
         userinput = input("")
+        print('')
 
         if userinput == "quit" or userinput == "Quit":
             print('Goodbye')

@@ -1,18 +1,14 @@
 def newUser():
-    print('Enter a new username: ')
-    newUserName = input("")
-    print('Enter a new user password: ')
-    newUserPass = input("")
-    print('Confirm password: ')
-    confirmUserPass = input("")
+    newUserName = input("Enter a new username: ")
+    newUserPass = input("Enter a new user password: ")
+    confirmUserPass = input("Confirm password: ")
 
     #FIXME range is bugged
     if newUserPass != confirmUserPass:
         for i in range(3, -1, -1):
             if newUserPass != confirmUserPass:
                 print(i, 'chances remain.')
-                print('Error: Confirm password:')
-                confirmUserPass = input("")
+                confirmUserPass = input("Error: Confirm password: ")
     else:
         with open('accounts.txt', 'a') as out:
             out.write(newUserName + ' ' + newUserPass + '\n')
@@ -24,14 +20,20 @@ def newUser():
 #FIXME does not read line to check if username exists
 def findUser(n):
     with open('accounts.txt', 'r') as f:
-        text = f.readlines()
-        name = n
-        if name in text:
-            print('Success')
-            
-        else:
-            print('Error: Unknown name. Try again:')
-        f.close()
+        for i, line in enumerate(f):
+            if n in line: 
+                valid = True
+                break
+            else:
+                valid = False
+
+    if valid == True:
+        print("Success")
+        print('')
+    else:
+        print("Error: Unknown username.")
+        print("Enter username: ")
+
 
 def main():
     print("Enter username: ")

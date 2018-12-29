@@ -1,27 +1,40 @@
+def fileWrite(name, password):
+    with open('accounts.txt', 'a') as out:
+        out.write(name + ' ' + password + '\n')
+        out.close()
+
+
 def newUser():
     newUserName = input("Enter a new username: ")
     newUserPass = input("Enter a new user password: ")
     confirmUserPass = input("Confirm password: ")
 
-    #FIXME range is bugged
-    if newUserPass != confirmUserPass:
-        for i in range(3, -1, -1):
-            if newUserPass != confirmUserPass:
-                print(i, 'chances remain.')
-                confirmUserPass = input("Error: Confirm password: ")
-    else:
-        with open('accounts.txt', 'a') as out:
-            out.write(newUserName + ' ' + newUserPass + '\n')
-            out.close()
-        print('Success')
-        print('Enter username: ')
+    for i in range(3, -1, -1):
+        if newUserPass == confirmUserPass:
+            fileWrite(newUserName, newUserPass)
+            print("Success.")
+            print("Enter username: ")
+            break
 
+        else:
+            if i == 0:
+                print("Error: Max attempts reached.")
+                print('')
+                print("Enter username:")
+                print("Enter new to create a new user")
+                break
 
-#FIXME does not read line to check if username exists
+            else:
+                print('')
+                print("Password confirmation unsuccessful.")
+                print(i, "attempts remaining.")
+                confirmUserPass = input("Confirm password: ")
+
 def findUser(n):
     with open('accounts.txt', 'r') as f:
         for i, line in enumerate(f):
-            if n in line: 
+            namePassList = line.split(' ')
+            if n == namePassList[0]: 
                 valid = True
                 break
             else:
@@ -29,8 +42,8 @@ def findUser(n):
 
     if valid == True:
         print("Success")
-        print('')
     else:
+        print('')
         print("Error: Unknown username.")
         print("Enter username: ")
 
@@ -40,7 +53,6 @@ def main():
     print("Enter new to create a new user")
     while True:
         userinput = input("")
-        print('')
 
         if userinput == "quit" or userinput == "Quit":
             print('Goodbye')

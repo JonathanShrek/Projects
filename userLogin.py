@@ -1,8 +1,15 @@
+#FIXME error with namePassList. Bug reading usernames.
+def fileRead():
+    with open('accounts.txt', 'r') as f:
+        for i, line in enumerate(f):
+            namePassList = line.split(' ')
+            print(namePassList)
+        return namePassList
+
 def fileWrite(name, password):
     with open('accounts.txt', 'a') as out:
         out.write(name + ' ' + password + '\n')
         out.close()
-
 
 def newUser():
     newUserName = input("Enter a new username: ")
@@ -31,22 +38,21 @@ def newUser():
                 confirmUserPass = input("Confirm password: ")
 
 def findUser(n):
-    with open('accounts.txt', 'r') as f:
-        for i, line in enumerate(f):
-            namePassList = line.split(' ')
-            if n == namePassList[0]: 
-                valid = True
-                break
-            else:
-                valid = False
-
-    if valid == True:
-        print("Success")
+    namePassList = fileRead()
+    name = namePassList[0]
+    if n == name: 
+        return True
     else:
-        print('')
-        print("Error: Unknown username.")
-        print("Enter username: ")
+        return False
 
+#FIXME bugged. Not detecting correct password
+def passwordFunc(p):
+    namePassList = fileRead()
+    password = namePassList[1]
+    if p == password:
+        return True
+    else:
+        return False
 
 def main():
     print("Enter username: ")
@@ -62,7 +68,17 @@ def main():
             newUser() 
 
         else:
-            findUser(userinput)
+            if findUser(userinput) == True:
+                password = input("Enter password: ")
+                if passwordFunc(password) == True:
+                    print("Successfully logged in. Welcome", userinput)
+
+                else:
+                    print("Wrong password. Please try again.")
+
+            else:
+                print("Error: Unknown username.")
+                print("Please try again.")
 
 if __name__ == "__main__":
     main()

@@ -1,2 +1,2 @@
 # UserLogin
-A repo for all of my side projects
+A program that allows users to create accounts and login to access their personal stuff.

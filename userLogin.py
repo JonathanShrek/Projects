@@ -1,111 +1,60 @@
-class password:
-    def hash_password(self, password):
-        from hashlib import blake2b
-        h = blake2b(digest_size=64)
-        passwordByte = str.encode(password)
-        h.update(passwordByte)
-        return h.hexdigest()
+import json
+from passlib.hash import argon2
+from tkinter import *
 
-    def passwordFunc(self, p):
-        read = fileManipulation()
-        passClass = password()
-        namePassList = read.fileRead()
-        passList = [i.split(' ')[1] for i in namePassList]
-        passHash = passClass.hash_password(p)
-        if passHash in passList:
-            return True
+class User:
+    def newUser(self, userPassDict):
+        username = input("Enter new username: ")
+        if username in userPassDict:
+            print("Username already taken.")
+
         else:
-            return False
-
-class fileManipulation:
-    def fileRead(self):
-        with open('accounts.txt') as f:
-            lines = f.read().splitlines()
-            return lines
-
-    def fileWrite(self, name, password):
-        with open('accounts.txt', 'a') as out:
-            out.write(name + ' ' + password + '\n')
-            out.close()
-
-class user:
-    def newUser(self):
-        passClass = password()
-        fileClass = fileManipulation()
-        newUserName = input("Enter a new username: ")
-        newUserPass = input("Enter a new user password: ")
-        confirmUserPass = input("Confirm password: ")
-
-        for i in range(3, -1, -1):
-            if newUserPass == confirmUserPass:
-                passHash = passClass.hash_password(newUserPass)
-                fileClass.fileWrite(newUserName, passHash)
-                print("Success.")
-                print("Enter username: ")
-                break
-
-            else:
-                if i == 0:
-                    print("Error: Max attempts reached.")
-                    print('')
-                    print("Enter username:")
-                    print("Enter new to create a new user")
+            password = input("Enter new password: ")
+            confirmPass = input("Confirm password: ") 
+            for i in range(3, -1, -1):
+                if password == confirmPass:
+                    passHash = argon2.using(rounds=4).hash(password)
+                    userPassDict[username] = passHash
+                    with open('userData.json', 'w') as fp:
+                        json.dump(userPassDict, fp, sort_keys=True, indent=4)
+                    print("Success")
                     break
-
+            
                 else:
-                    print('')
-                    print("Password confirmation unsuccessful.")
-                    print(i, "attempts remaining.")
-                    confirmUserPass = input("Confirm password: ")
-
-    def findUser(self, n):
-        fileClass = fileManipulation()
-        namePassList = fileClass.fileRead()
-        nameList = [i.split(' ')[0] for i in namePassList]
-        if n in nameList:
-            return True
-        else:
-            return False
-
-
-def main():
-    userClass = user()
-    passClass = password()
-    print("Enter new to create a new user")
-    print("Enter username: ")
-    while True:
-        userinput = input("")
-
-        if userinput == "quit" or userinput == "Quit":
-            print('Goodbye')
-            break
-
-        elif userinput == 'new' or userinput == 'New':
-            userClass.newUser() 
-
-        else:
-            if userClass.findUser(userinput) == True:
-                passInput = input("Enter password: ")
-
-                for i in range(3, -1, -1):
-                    if passClass.passwordFunc(passInput) == True:
-                        print("Successfully logged in. Welcome", userinput + "!")
-                        break
+                    if i == 0:
+                        print("Error: Max attempts reached.")
 
                     else:
-                        if i == 0:
-                            print("Error: Max attempts reached. Goodbye.")
-                            print('')
-                            print("Enter new to create a new user") 
-                            print("Enter username: ")
-                            break
-                        else:
-                            print("Incorrect password.", i, "attempts remain.")
-                            passInput = input("Enter password: ")
+                        print("Error:", i, "attempts remain.")
+                        confirmPass = input("Try again: ")
 
+def main():
+    userClass = User()
+
+    try:
+        with open('userData.json', 'r') as fp:
+            userPassDict = json.load(fp)
+    except:
+        userPassDict = {}
+
+    while True:
+        username = input("Enter username: ") 
+
+        if username == 'new' or username == 'New':
+            userClass.newUser(userPassDict)
+
+        elif username in userPassDict:
+            password = input("Enter password: ")
+            existingHash = userPassDict[username]
+            if argon2.verify(password, existingHash):
+                print("Welcome.")
+                break
+            
             else:
-                print("Error: Unknown username.")
-                print("Please try again.")
+                print("Error: Try again.")
+
+        else:
+            print("Error: Try again.")
 
 if __name__ == "__main__":
     main()

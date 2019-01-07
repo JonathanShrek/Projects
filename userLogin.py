@@ -1,8 +1,34 @@
 import json
 from passlib.hash import argon2
 from tkinter import *
+import tkinter.messagebox as tm
 
-class User:
+class LoginFrame(Frame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.label_username = Label(self, text="Username")
+        self.label_password = Label(self, text="Password")
+
+        self.entry_username = Entry(self, bg="white", fg="black")
+        self.entry_password = Entry(self, bg="white", fg="black", show="*")
+
+        self.label_username.grid(row=0, sticky=E)
+        self.label_password.grid(row=1, sticky=E)
+        self.entry_username.grid(row=0, column=1, pady=5, padx=5)
+        self.entry_password.grid(row=1, column=1, padx=5)
+
+        self.checkbox = Checkbutton(self, text="Keep me logged in")
+        self.checkbox.grid(row=2, pady=5, columnspan=2)
+
+        self.logbtn = Button(self, text="Login", command=self.login_btn_clicked)
+        self.logbtn.grid(row=3, column=0, padx=5, pady=2, sticky=E)
+
+        self.newbtn = Button(self, text="New User", command = self.newUser)
+        self.newbtn.grid(row=3, column=1, sticky=W, pady=2)
+
+        self.pack(side=TOP)
+
     def newUser(self, userPassDict):
         username = input("Enter new username: ")
         if username in userPassDict:
@@ -28,33 +54,33 @@ class User:
                         print("Error:", i, "attempts remain.")
                         confirmPass = input("Try again: ")
 
-def main():
-    userClass = User()
+    def login_btn_clicked(self):
 
-    try:
-        with open('userData.json', 'r') as fp:
-            userPassDict = json.load(fp)
-    except:
-        userPassDict = {}
+        try:
+            with open('userData.json', 'r') as fp:
+                userPassDict = json.load(fp)
+        except:
+            userPassDict = {}
 
-    while True:
-        username = input("Enter username: ") 
+        while True:
+            username = self.entry_username.get()
+            password = self.entry_password.get()
 
-        if username == 'new' or username == 'New':
-            userClass.newUser(userPassDict)
+            if username in userPassDict:
+                existingHash = userPassDict[username]
+                if argon2.verify(password, existingHash):
+                    tm.showinfo("Login info", "Welcome " + username)
+                    break
+                
+                else:
+                    tm.showinfo("Error", "Try again.")
+                    break
 
-        elif username in userPassDict:
-            password = input("Enter password: ")
-            existingHash = userPassDict[username]
-            if argon2.verify(password, existingHash):
-                print("Welcome.")
-                break
-            
             else:
-                print("Error: Try again.")
+                tm.showinfo("Error", "Try again.")
+                break
 
-        else:
-            print("Error: Try again.")
+root = Tk()
+lf = LoginFrame(root)
+root.mainloop()
 
-if __name__ == "__main__":
-    main()

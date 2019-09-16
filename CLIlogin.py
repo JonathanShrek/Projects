@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import json
+#import mysql.connector as mariadb
 from passlib.hash import argon2
 
 try:
